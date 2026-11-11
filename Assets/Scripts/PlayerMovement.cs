@@ -5,6 +5,7 @@ public class PlayerMovement : MonoBehaviour
      [Header("Controllers")]
      private PlayerControls playerControls;
      private CharacterController characterController;
+     private Player player;
      //Animator component erişimini sağlayacak değişkenin tanımlanması
      private Animator animator;
 
@@ -26,41 +27,16 @@ public class PlayerMovement : MonoBehaviour
      [SerializeField] LayerMask aimLayerMask;
      [SerializeField] Transform aimTarget;
 
-     private void Awake()
-     {
-        playerControls = new PlayerControls();
-
-        //Fire Input Player Action Map
-        playerControls.Character.Fire.performed += context => Shoot(); 
-
-        //Movement Input Player Action Map
-        playerControls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
-        playerControls.Character.Movement.canceled += context => moveInput = Vector2.zero;
-
-        //Aim Input Player Action Map
-        playerControls.Character.Aim.performed += context => aimInput = context.ReadValue<Vector2>();
-        playerControls.Character.Aim.canceled += context => aimInput = Vector2.zero;    
-
-        //Run Input Player Action Map
-        playerControls.Character.Run.performed += context => 
-        {
-            speed = runSpeed;
-            isRunning = true;
-        };
-        
-        playerControls.Character.Run.canceled += context => 
-        {
-            speed = walkSpeed;
-            isRunning = false;
-        };
-     }
 
      private void Start()
      {
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
+        player = GetComponent<Player>();
 
         speed = walkSpeed;
+
+        AssignInputEvents();
      }
 
      private void Update()
@@ -122,25 +98,44 @@ public class PlayerMovement : MonoBehaviour
             transform.forward = lookDirection;
         }
 
-        aimTarget.position = new Vector3(hitInfo.point.x, transform.position.y, hitInfo.point.z);
+        aimTarget.position = new Vector3(hitInfo.point.x, transform.position.y +.6f, hitInfo.point.z);
      }
 
-     private void Shoot()
+     //private void Shoot()
+     //{
+       //Debug.Log("SHOOT"); 
+       //animator.SetTrigger("Fire");
+     //}
+
+     private void AssignInputEvents()
      {
-       Debug.Log("SHOOT"); 
-       animator.SetTrigger("Fire");
+        //playerControls = new PlayerControls();
+        playerControls = player.playerControls;
+
+        //Fire Input Player Action Map
+        //playerControls.Character.Fire.performed += context => Shoot(); 
+
+        //Movement Input Player Action Map
+        playerControls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
+        playerControls.Character.Movement.canceled += context => moveInput = Vector2.zero;
+
+        //Aim Input Player Action Map
+        playerControls.Character.Aim.performed += context => aimInput = context.ReadValue<Vector2>();
+        playerControls.Character.Aim.canceled += context => aimInput = Vector2.zero;    
+
+        //Run Input Player Action Map
+        playerControls.Character.Run.performed += context => 
+        {
+            speed = runSpeed;
+            isRunning = true;
+        };
+        
+        playerControls.Character.Run.canceled += context => 
+        {
+            speed = walkSpeed;
+            isRunning = false;
+        };
+
      }
-
-
-     private void OnEnable()
-     {
-        playerControls.Enable();
-     }
-     private void OnDisable()
-     {
-        playerControls.Disable();
-     }
-
-
 
 }
