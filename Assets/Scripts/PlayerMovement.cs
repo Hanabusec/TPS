@@ -18,6 +18,8 @@ public class PlayerMovement : MonoBehaviour
     private float speed;
     [SerializeField] float walkSpeed = 1f;
     [SerializeField] float runSpeed = 4f;
+
+    [SerializeField] float turnSpeed = 10f;
     [SerializeField] float gravityScale = -9.81f;
     private float verticalVelocity;
     private bool isRunning;
@@ -95,7 +97,10 @@ public class PlayerMovement : MonoBehaviour
         lookDirection.y = 0f;
         lookDirection.Normalize();
 
-        transform.forward = lookDirection;
+        //transform.forward = lookDirection;
+
+        Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         //}
 
         //aimTarget.position = new Vector3(hitInfo.point.x, transform.position.y +.6f, hitInfo.point.z);
